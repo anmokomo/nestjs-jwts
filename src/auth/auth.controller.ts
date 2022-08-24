@@ -8,11 +8,10 @@ import {
 } from '@nestjs/common';
 
 import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
-import { RtGuard } from '../common/guards';
+import {AtGuard, RtGuard} from '../common/guards';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { Tokens } from './types';
-import {AuthGuard} from "@nestjs/passport";
 
 @Controller('auth')
 export class AuthController {
@@ -40,7 +39,8 @@ export class AuthController {
   - for example- if in Postman, would signin, copy the at, add at to the Auth header value after 'Bearer' (Value: Bearer <token w/o quotes>)
   - successful signout = rtHash in db is now null
    */
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt')) //look for jwt
+  @UseGuards(AtGuard) //can use this isntead of above
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() userId: number): Promise<boolean> {
@@ -55,8 +55,8 @@ export class AuthController {
   * if there is no refresh token, or if just an access token is given, will fail
   * */
   @Public()
-  @UseGuards(AuthGuard('jwt-refresh')) //look for a jwt refresh token
-  // @UseGuards(RtGuard)
+  // @UseGuards(AuthGuard('jwt-refresh')) //look for a jwt refresh token
+  @UseGuards(RtGuard)//can use this instead of above -
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   refreshTokens(
